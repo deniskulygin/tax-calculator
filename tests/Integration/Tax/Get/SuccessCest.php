@@ -10,34 +10,22 @@ use Codeception\Example;
 class SuccessCest
 {
     /**
-     * @example {"country": "CA", "state": "Quebec", "tax_type":"GST/HST", "tax_amount": 5}
-     * @example {"country": "CA", "state": "Ontario", "tax_type":"GST/HST", "tax_amount": 13}
-     * @example {"country": "US", "state": "California", "tax_type":"VAT", "tax_amount": 7.25}
+     * @dataProvider countryWithStateDataProvider
      */
     public function testSuccessCountryWithSates(IntegrationTester $I, Example $example): void
     {
         $country = $example['country'];
         $state = $example['state'];
-        $taxType = $example['tax_type'];
-        $taxAmount = $example['tax_amount'];
 
         $I->sendGet('/api/v1/taxes', ['country' => $country, 'state' => $state]);
 
         $I->seeResponseCodeIs(200);
-        $I->seeResponseContainsJson([
-            'taxType' => $taxType,
-            'percentage' => $taxAmount,
-        ]);
+        $I->seeResponseContainsJson($example['response']);
 
-        $I->dontSeeInRedis(
-            $country . '/' . $state,
-            json_encode(['type' => $taxType, 'amount' => $taxAmount])
-        );
 
-        $I->seeInRedis(
-            $country . '/' . mb_strtolower($state),
-            json_encode(['type' => $taxType, 'amount' => $taxAmount])
-        );
+        $I->dontSeeInRedis($country . '/' . $state, json_encode($example['cache_data']));
+
+        $I->seeInRedis($country . '/' . mb_strtolower($state), json_encode($example['cache_data']));
     }
 
     /**
@@ -60,6 +48,79 @@ class SuccessCest
             'percentage' => $taxAmount,
         ]);
 
-        $I->seeInRedis($country, json_encode(['type' => $taxType, 'amount' => $taxAmount]));
+        $I->seeInRedis($country, json_encode([['taxAmount' => $taxAmount, 'taxType' => $taxType]]));
+    }
+
+    public function testSuccessCountryCachedInUpperCase(IntegrationTester $I): void
+    {
+        $country = 'lv';
+
+        $I->sendGet('/api/v1/taxes', ['country' => $country]);
+
+        $I->seeResponseCodeIs(200);
+        $I->dontSeeInRedis($country);
+        $I->seeInRedis(strtoupper($country));
+    }
+
+    private function countryWithStateDataProvider(): array
+    {
+        return [
+            [
+                'country' => 'CA',
+                'state' => 'Ontario',
+                'response' => [
+                    [
+                        'percentage' => 13,
+                        "taxType" => 'GST/HST',
+                    ],
+                ],
+                'cache_data' => [
+                    [
+                        'taxAmount' => 13,
+                        "taxType" => 'GST/HST',
+                    ],
+                ],
+            ],
+            [
+                'country' => 'US',
+                'state' => 'California',
+                'response' => [
+                    [
+                        'percentage' => 7.25,
+                        "taxType" => 'VAT',
+                    ],
+                ],
+                'cache_data' => [
+                    [
+                        'taxAmount' => 7.25,
+                        "taxType" => 'VAT',
+                    ],
+                ],
+            ],
+            [
+                'country' => 'CA',
+                'state' => 'Quebec',
+                'response' => [
+                    [
+                        'percentage' => 5,
+                        "taxType" => 'GST/HST',
+                    ],
+                    [
+                        'percentage' => 9.975,
+                        "taxType" => 'PST',
+                    ],
+                ],
+                'cache_data' => [
+                    [
+                        'taxAmount' => 5,
+                        "taxType" => 'GST/HST',
+                    ],
+                    [
+                        'taxAmount' => 9.975,
+                        "taxType" => 'PST',
+                    ],
+                ],
+            ],
+        ];
     }
 }

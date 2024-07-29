@@ -8,7 +8,7 @@ use App\ExternalService\SeriousTax\Location;
 use App\ExternalService\SeriousTax\SeriousTaxService;
 use App\ExternalService\SeriousTax\TimeoutException;
 use App\Tax\DTO\TaxDTO;
-use App\Tax\DTO\TaxResultDTO;
+use App\Tax\DTO\TaxResultCollection;
 use App\Tax\TaxFacade;
 
 class SeriousTaxRetriever implements TaxRetrieverInterface
@@ -22,10 +22,10 @@ class SeriousTaxRetriever implements TaxRetrieverInterface
     /**
      * @throws TimeoutException
      */
-    public function retrieveTax(TaxDTO $data): TaxResultDTO
+    public function retrieveTax(TaxDTO $data): TaxResultCollection
     {
         $result = $this->seriousTaxService->getTaxesResult(new Location($data->getCountry(), $data->getState()));
 
-        return TaxFacade::hydrateTaxResult($result, self::TAX_TYPE);
+        return TaxFacade::hydrateSeriousTaxResult($result, self::TAX_TYPE);
     }
 }

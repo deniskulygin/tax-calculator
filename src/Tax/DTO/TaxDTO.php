@@ -6,7 +6,7 @@ namespace App\Tax\DTO;
 
 class TaxDTO
 {
-    private string $country;
+    private readonly string $country;
     private ?string $state = null;
 
     public function setCountry(string $country): self

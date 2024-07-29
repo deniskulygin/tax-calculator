@@ -17,11 +17,20 @@ class TaxController extends AbstractController
 {
     #[Route('/taxes')]
     public function getTaxes(
-        #[MapQueryString] TaxRequestDTO $requestDTO,
-        TaxCalculatorInterface $taxService
+        TaxCalculatorInterface $taxService,
+        #[MapQueryString] TaxRequestDTO $requestDTO = null,
     ): Response {
-        $tax = $taxService->getTax(TaxFacade::hydrateTax($requestDTO->getCountry(), $requestDTO->getState()));
+        if ($requestDTO === null) {
+            return $this->json(['message' => 'Country is required'], Response::HTTP_BAD_REQUEST);
+        }
 
-        return $this->json(data: $tax, context: [AbstractNormalizer::GROUPS => ['tax_default']]);
+        $resultCollection = $taxService->getTax(
+            TaxFacade::hydrateTax($requestDTO->getCountry(), $requestDTO->getState())
+        );
+
+        return $this->json(
+            data: $resultCollection->getCollection(),
+            context: [AbstractNormalizer::GROUPS => ['tax_default']]
+        );
     }
 }

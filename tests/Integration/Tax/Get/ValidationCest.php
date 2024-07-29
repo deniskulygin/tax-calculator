@@ -17,13 +17,13 @@ class ValidationCest
     public function testNotSupportedCountries(IntegrationTester $I, Example $example): void
     {
         $I->sendGet('/api/v1/taxes', ['country' => $example['country']]);
-        
+
         $I->seeResponseCodeIs(400);
         $I->seeResponseContainsJson(['message' => $example['message']]);
-        
+
         $I->dontSeeInRedis((string) $example['country']);
     }
-    
+
     /**
      * @example {"country": "CAA"}
      * @example {"country": "C"}
@@ -31,30 +31,30 @@ class ValidationCest
     public function testCountryLengthLimit(IntegrationTester $I, Example $example): void
     {
         $I->sendGet('/api/v1/taxes', ['country' => $example['country']]);
-        
+
         $I->seeResponseCodeIs(400);
         $I->seeResponseIsJson([
             ['message' => 'Country is not supported'],
             ['message' => 'Country name name must be 2 characters long'],
         ]);
     }
-    
+
     /**
      * @dataProvider stateLengthLimitProvider
      */
     public function testStateLengthLimit(IntegrationTester $I, Example $example): void
     {
         $I->sendGet('/api/v1/taxes', ['country' => 'CA', 'state' => $example['state']]);
-        
+
         $I->seeResponseCodeIs(400);
         $I->seeResponseContainsJson(['message' => $example['message']]);
-        
+
         $I->seeResponseIsJson([
             ['message' => 'State is not supported'],
             ['message' => $example['state']],
         ]);
     }
-    
+
     /**
      * @example {"country": "US", "state": "State"}
      * @example {"country": "US", "state": 342}
@@ -62,13 +62,13 @@ class ValidationCest
     public function testNotSupportedState(IntegrationTester $I, Example $example): void
     {
         $I->sendGet('/api/v1/taxes', ['country' => $example['country'], 'state' => $example['state']]);
-        
+
         $I->seeResponseCodeIs(400);
         $I->seeResponseContainsJson(['message' => 'State is not supported']);
-        
+
         $I->dontSeeInRedis($example['country'] . '/' . $example['state']);
     }
-    
+
     private function stateLengthLimitProvider(): array
     {
         return [

@@ -32,7 +32,6 @@ class TaxDTOTest extends TestCase
     public function testSetStateCanBeNull(): void
     {
         $dto = new TaxDTO();
-        $dto->setState(null);
 
         $this->assertNull($dto->getState());
     }

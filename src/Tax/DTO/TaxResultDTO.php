@@ -9,25 +9,13 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
 
 final readonly class TaxResultDTO
 {
-    #[Groups(['tax_default'])]
-    #[SerializedName('percentage')]
-    private float $taxAmount;
-
-    #[Groups(['tax_default'])]
-    private string $taxType;
-
-    public function setTaxType(string $taxType): self
-    {
-        $this->taxType = $taxType;
-
-        return $this;
-    }
-
-    public function setTaxAmount(float $taxAmount): self
-    {
-        $this->taxAmount = $taxAmount;
-
-        return $this;
+    public function __construct(
+        #[Groups(['tax_default'])]
+        #[SerializedName('percentage')]
+        private float $taxAmount,
+        #[Groups(['tax_default'])]
+        private string $taxType
+    ) {
     }
 
     public function getTaxAmount(): float
@@ -38,5 +26,13 @@ final readonly class TaxResultDTO
     public function getTaxType(): string
     {
         return $this->taxType;
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'taxAmount' => $this->taxAmount,
+            'taxType' => $this->taxType,
+        ];
     }
 }

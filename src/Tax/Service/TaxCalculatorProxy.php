@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tax\Service;
 
-use App\Cache\TaxCacheInterface;
+use App\Tax\Cache\TaxCacheInterface;
 use App\Tax\DTO\TaxDTO;
-use App\Tax\DTO\TaxResultDTO;
+use App\Tax\DTO\TaxResultCollection;
 
 readonly class TaxCalculatorProxy implements TaxCalculatorInterface
 {
@@ -16,7 +16,7 @@ readonly class TaxCalculatorProxy implements TaxCalculatorInterface
     ) {
     }
 
-    public function getTax(TaxDTO $data): TaxResultDTO
+    public function getTax(TaxDTO $data): TaxResultCollection
     {
         $cachedResult = $this->taxCacheService->getCachedTax($data);
 

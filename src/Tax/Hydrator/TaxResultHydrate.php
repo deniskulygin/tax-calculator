@@ -8,10 +8,8 @@ use App\Tax\DTO\TaxResultDTO;
 
 class TaxResultHydrate
 {
-    public static function hydrate(TaxResultDTO $taxResultDTO, float $amount, string $type): TaxResultDTO
+    public static function hydrate(float $amount, string $type): TaxResultDTO
     {
-        return $taxResultDTO
-            ->setTaxType($type)
-            ->setTaxAmount($amount);
+        return new TaxResultDTO($amount, $type);
     }
 }

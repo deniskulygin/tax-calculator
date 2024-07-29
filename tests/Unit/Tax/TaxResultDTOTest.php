@@ -9,23 +9,28 @@ use PHPUnit\Framework\TestCase;
 
 class TaxResultDTOTest extends TestCase
 {
-    public function testSetAndGetTaxType(): void
+    public function testFillAndGetData(): void
     {
-        $dto = new TaxResultDTO();
+        $taxAmount = 15.5;
         $taxType = 'VAT';
-
-        $dto->setTaxType($taxType);
+        $dto = new TaxResultDTO($taxAmount, $taxType);
 
         $this->assertSame($taxType, $dto->getTaxType());
+        $this->assertSame($taxAmount, $dto->getTaxAmount());
     }
 
-    public function testSetAndGetTaxAmount(): void
+    public function testSetAllValuesAndGetAsArray(): void
     {
-        $dto = new TaxResultDTO();
         $taxAmount = 15.5;
+        $taxType = 'VAT';
+        $dto = new TaxResultDTO($taxAmount, $taxType);
 
-        $dto->setTaxAmount($taxAmount);
-
-        $this->assertSame($taxAmount, $dto->getTaxAmount());
+        $this->assertSame(
+            [
+                'taxAmount' => $taxAmount,
+                'taxType' => $taxType,
+            ],
+            $dto->toArray()
+        );
     }
 }
