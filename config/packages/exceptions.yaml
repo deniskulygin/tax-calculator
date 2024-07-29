@@ -1,0 +1,5 @@
+framework:
+  exceptions:
+    Exception:
+      log_level: 'debug'
+      status_code: 404
