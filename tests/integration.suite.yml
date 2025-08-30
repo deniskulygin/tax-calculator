@@ -1,0 +1,24 @@
+actor: IntegrationTester
+coverage:
+  enabled: true
+  c3_url: '%APP_URL%'
+  remote: true
+
+modules:
+  enabled:
+    - Asserts
+    - REST:
+        depends: PhpBrowser
+        part: Json
+        url: "%APP_URL%"
+        timeout: 10
+    - PhpBrowser:
+        url: ''
+        curl:
+          CURLOPT_TIMEOUT: 90
+    - Redis:
+        host: '%REDIS_HOST%'
+        port: '%REDIS_PORT%'
+        database: '%REDIS_PERSISTENCE_DATABASE%'
+        cleanupBefore: 'test'
+
